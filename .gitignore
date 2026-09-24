@@ -8,7 +8,6 @@ __pycache__/
 logs/*.jsonl
 logs/*.log
 logs/*.csv
-data/baseline.json
 .DS_Store
 Thumbs.db
 build/
