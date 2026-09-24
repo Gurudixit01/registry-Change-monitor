@@ -1,195 +1,187 @@
-Windows Registry Change Monitoring System
-Overview
-The Windows Registry Change Monitoring System is a cybersecurity project designed to monitor critical Windows Registry locations, detect suspicious modifications, generate alerts, and create detailed reports for security analysis.
+# Windows Registry Change Monitoring System
 
-The project focuses on identifying malware persistence techniques, unauthorized registry modifications, and security-related configuration changes.
+A cybersecurity tool that monitors critical Windows Registry locations, detects suspicious modifications, generates alerts, and produces detailed reports for analysis.
 
-Features
-Monitor Windows Registry autorun locations
-Create registry baseline snapshots
-Perform registry integrity verification
-Detect added, modified, and deleted registry values
-Detect malware-like registry behavior
-Generate real-time alerts
-Create CSV-based analysis reports
-Continuous monitoring at configurable intervals
-Project Structure
-src/
-├── cli.py
-├── config.py
-├── detector.py
-├── monitor.py
-├── registry.py
-├── reporting.py
-└── __init__.py
+## Table of Contents
 
-data/
-logs/
-tests/
-Requirements
-Windows Operating System
-Python 3.8+
-Administrator privileges (recommended)
-Install dependencies:
+- [Overview](#overview)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Monitored Registry Keys](#monitored-registry-keys)
+- [Example Workflow](#example-workflow)
+- [Project Objectives](#project-objectives)
+- [License](#license)
 
+## Overview
+
+The system takes a snapshot of the Windows Registry, compares it against later states, and flags added, modified, or deleted values. It focuses on locations commonly abused by malware for persistence, such as autorun keys, and on security-related settings like Windows Defender, firewall, and UAC policies.
+
+## Features
+
+- **Registry baseline creation:** capture a known-good snapshot of the registry
+- **Registry integrity verification:** compare the current state against the baseline
+- **Real-time change monitoring:** continuous, periodic snapshot comparison
+- **Autorun persistence detection:** watch `Run` and `RunOnce` keys
+- **Malware-like behavior detection:** flag suspicious changes with a severity and reason
+- **Alert generation:** alerts and logs for every detected change
+- **CSV report generation:** export all detected events for analysis
+
+## Project Structure
+
+```text
+windows-registry/
+├── src/
+│   ├── cli.py         # Command-line entry point
+│   ├── config.py      # Monitored keys and settings
+│   ├── detector.py    # Change and suspicious-behavior detection
+│   ├── monitor.py     # Continuous monitoring engine
+│   ├── registry.py    # Registry reading and snapshot logic
+│   └── reporting.py   # CSV report generation
+├── data/              # Baseline snapshot (baseline.json)
+├── logs/              # Alerts, logs, and reports
+└── tests/             # Test suite
+```
+
+## Installation
+
+**1. Clone the repository**
+
+```shell
+git clone https://github.com/Gurudixit01/windows-registry.git
+cd windows-registry
+```
+
+**2. Install dependencies**
+
+```shell
 pip install -r requirements.txt
-Running the Project
-Step 1: Create Baseline Snapshot
-Generate an initial registry snapshot that will act as the trusted baseline.
+```
 
+## Usage
+
+All commands are run through the CLI module:
+
+| Command | Purpose | Output |
+|---------|---------|--------|
+| `python -m src.cli baseline` | Create a baseline snapshot | `data/baseline.json` |
+| `python -m src.cli check` | Run an integrity check against the baseline | Console results |
+| `python -m src.cli monitor` | Start continuous monitoring | Alerts and logs |
+| `python -m src.cli report` | Generate a security report | `logs/registry_report.csv` |
+
+### 1. Create a Baseline Snapshot
+
+Captures the current registry state and saves it for future comparison.
+
+```shell
 python -m src.cli baseline
-Output:
+```
 
-data/baseline.json
-The baseline stores the current state of monitored registry keys.
+Output: `data/baseline.json`
 
-Step 2: Verify Registry Integrity
-Compare the current registry state with the saved baseline.
+### 2. Run an Integrity Check
 
+Compares the current registry state against the saved baseline.
+
+```shell
 python -m src.cli check
-The system will identify:
+```
 
-Added values
-Modified values
-Deleted values
-Step 3: Start Real-Time Monitoring
-Launch the registry monitoring engine.
+Detects:
 
+- Added registry values
+- Modified registry values
+- Deleted registry values
+
+### 3. Start Continuous Monitoring
+
+Launches the monitoring engine.
+
+```shell
 python -m src.cli monitor
-The monitor performs the following operations:
+```
 
-Reads all configured registry keys.
-Captures a snapshot of the current registry state.
-Waits for the configured polling interval.
-Captures a new snapshot.
-Compares both snapshots.
-Detects additions, modifications, and deletions.
-Generates alerts and log entries.
-Default monitoring interval:
+The system:
 
-10 Seconds
-Step 4: Generate Analysis Report
-Generate a detailed CSV report from recorded monitoring events.
+1. Reads the monitored registry keys.
+2. Creates periodic snapshots.
+3. Compares the current snapshot with the previous one.
+4. Detects changes.
+5. Generates alerts and logs.
 
+Default monitoring interval: **10 seconds**
+
+### 4. Generate a Security Report
+
+Generates a CSV report containing all detected events.
+
+```shell
 python -m src.cli report
-Output:
+```
 
-logs/registry_report.csv
-The report includes:
+Output: `logs/registry_report.csv`
 
-Timestamp
-Registry Path
-Registry Value Name
-Action Type
-Previous Value
-New Value
-Severity Level
-Detection Reason
-Monitored Registry Locations
-Autorun Keys
+| Column | Description |
+|--------|-------------|
+| Timestamp | When the change was detected |
+| Registry Path | Location of the changed value |
+| Change Type | Added, modified, or deleted |
+| Old Value | Value before the change |
+| New Value | Value after the change |
+| Severity | Severity rating of the event |
+| Detection Reason | Why the change was flagged |
+
+## Monitored Registry Keys
+
+### Autorun Locations
+
+```text
 HKCU\Software\Microsoft\Windows\CurrentVersion\Run
 HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce
 HKLM\Software\Microsoft\Windows\CurrentVersion\Run
 HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
-Security Related Keys
-HKLM\SOFTWARE\Policies\Microsoft\Windows Defender
-HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess
-HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
-HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
-Project Workflow
-Registry Keys
-      │
-      ▼
-Snapshot Collection
-      │
-      ▼
-Baseline Creation
-      │
-      ▼
-Continuous Monitoring
-      │
-      ▼
-Change Detection
-      │
-      ▼
-Malware Behavior Analysis
-      │
-      ▼
-Alert Generation
-      │
-      ▼
-Report Generation
-Module Description
-registry.py
-Responsible for:
+```
 
-Reading registry keys
-Creating snapshots
-Loading baseline data
-Saving baseline data
-monitor.py
-Responsible for:
+### Security-Related Locations
 
-Continuous monitoring
-Snapshot comparison
-Event generation
-detector.py
-Responsible for:
+- Windows Defender policies
+- Firewall configuration
+- Winlogon configuration
+- UAC policies
 
-Detecting suspicious changes
-Identifying persistence mechanisms
-Security configuration analysis
-Severity classification
-reporting.py
-Responsible for:
+## Example Workflow
 
-Processing monitoring events
-Generating CSV reports
-Exporting security findings
-config.py
-Responsible for:
+1. **Create the baseline:**
 
-Registry path configuration
-Monitoring interval configuration
-System settings
-cli.py
-Provides command-line functionality:
+   ```shell
+   python -m src.cli baseline
+   ```
 
-baseline
-check
-monitor
-report
-Example Test
-Start monitoring:
+2. **Start monitoring:**
 
-python -m src.cli monitor
-Create a test registry value:
+   ```shell
+   python -m src.cli monitor
+   ```
 
-HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+3. **Make a registry change** (for example, add a new value under a `Run` key).
 
-Name:
-RegistryMonitorTest
+4. **Review the alert:** the system detects the modification and generates an alert.
 
-Value:
-C:\Windows\System32\notepad.exe
-Wait for the next monitoring cycle.
+5. **Generate the final report:**
 
-Expected Result:
+   ```shell
+   python -m src.cli report
+   ```
 
-New registry value detected
-Alert generated
-Event logged
-Report entry created
-Project Objectives Achieved
-✅ Monitor autorun registry keys for persistence mechanisms
+## Project Objectives
 
-✅ Detect malware-like registry changes
+- Monitor autorun registry keys for persistence mechanisms.
+- Detect malware-like registry changes.
+- Provide a registry integrity checker using baseline comparison.
+- Deliver real-time or scheduled alerts.
+- Generate detailed registry change reports.
 
-✅ Create a registry integrity checker using baseline comparison
+## License
 
-✅ Provide real-time or scheduled alerts on modifications
-
-✅ Generate detailed registry change reports for analysis
-
-Conclusion
-The Windows Registry Change Monitoring System provides continuous monitoring of critical registry locations, detects suspicious modifications, alerts users about unauthorized changes, and generates detailed reports for security analysis. The project helps improve system security by identifying registry-based persistence mechanisms and potential malware activity.
+Add your license here (e.g., MIT).
