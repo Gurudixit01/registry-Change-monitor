@@ -12,7 +12,6 @@ A cybersecurity tool that monitors critical Windows Registry locations, detects 
 - [Monitored Registry Keys](#monitored-registry-keys)
 - [Example Workflow](#example-workflow)
 - [Project Objectives](#project-objectives)
-- [License](#license)
 
 ## Overview
 
@@ -181,7 +180,3 @@ HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
 - Provide a registry integrity checker using baseline comparison.
 - Deliver real-time or scheduled alerts.
 - Generate detailed registry change reports.
-
-## License
-
-Add your license here (e.g., MIT).
