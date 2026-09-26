@@ -15,6 +15,7 @@ dist/
 *.egg-info/
 .pytest_cache/
 .coverage
+data/baseline.json
 htmlcov/
 .env
 .ipynb_checkpoints/
